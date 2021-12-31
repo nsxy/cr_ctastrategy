@@ -23,52 +23,12 @@ class BaseLogic(ABC):
 
 class BaseFilter(ABC):
 
-    def __init__(self, strategy: CtaTemplate) -> None:
-        self.__strategy = strategy
-
-    @property
-    def strategy(self) -> CtaTemplate:
-        return self.__strategy
-
-    @property
-    def trading_toggle(self) -> bool:
-        return self.__strategy.trading
-
-    @trading_toggle.setter
-    def trading_toggle(self, val: bool=True) -> None:
-        self.__strategy.trading = val
-
-    @property
-    def buy_toggle(self) -> bool:
-        return self.__strategy.buy_toggle
-    
-    @buy_toggle.setter
-    def buy_toggle(self, val: bool=True) -> None:
-        self.__strategy.buy_toggle = val
-    
-    @property
-    def sell_toggle(self) -> bool:
-        return self.__strategy.sell_toggle
-    
-    @sell_toggle.setter
-    def sell_toggle(self, val: bool=True) -> None:
-        self.__strategy.sell_toggle = val
-
-    @property
-    def short_toggle(self) -> bool:
-        return self.__strategy.short_toggle
-    
-    @short_toggle.setter
-    def short_toggle(self, val: bool=True) -> None:
-        self.__strategy.short_toggle = val
-
-    @property
-    def cover_toggle(self) -> bool:
-        return self.__strategy.cover_toggle
-    
-    @cover_toggle.setter
-    def cover_toggle(self, val: bool=True) -> None:
-        self.__strategy.cover_toggle = val
+    def __init__(self) -> None:
+        self.trading_toggle = True
+        self.buy_toggle = True
+        self.sell_toggle = True
+        self.short_toggle = True
+        self.cover_toggle = True
 
     @virtual
     def on_start(self):
@@ -104,3 +64,22 @@ class BaseFilter(ABC):
         set strategy toggle when new trade data update.
         """
         pass
+
+class Filter(BaseFilter):
+
+    def __init__(self, strategy: CtaTemplate) -> None:
+        super().__init__()
+        self.__strategy = strategy
+
+    @property
+    def strategy(self) -> CtaTemplate:
+        return self.__strategy
+    
+    def close_trading_toggle(self) -> None:
+        self.__strategy.trading = False
+    
+    def open_trading_toggle(self) -> None:
+        self.__strategy.trading = True
+    
+    def get_trading_toggle(self) -> bool:
+        return self.__strategy.trading

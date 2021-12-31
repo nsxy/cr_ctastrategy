@@ -15,7 +15,7 @@ from vnpy_ctastrategy import (
 )
 from vnpy_ctastrategy.base import StopOrder
 
-from .base import BaseFilter
+from .base import BaseFilter, Filter
 
 
 class CrCtaTemplate(CtaTemplate):
@@ -35,22 +35,22 @@ class CrCtaTemplate(CtaTemplate):
     ):
         super().__init__(cta_engine, strategy_name, vt_symbol, setting)
         ### filter toggle
-        self.buy_toggle = True
-        self.sell_toggle = True
-        self.short_toggle = True
-        self.cover_toggle = True
-        self.variables.extend(['buy_toggle', 'sell_toggle', 'short_toggle', 'cover_toggle'])
-        self.filter = None
+        # self.buy_toggle = True
+        # self.sell_toggle = True
+        # self.short_toggle = True
+        # self.cover_toggle = True
+        # self.variables.extend(['buy_toggle', 'sell_toggle', 'short_toggle', 'cover_toggle'])
+        self.filter = BaseFilter()
         self.__bg = BarGenerator(self.on_bar, window, self.on_call_bar, interval)
 
-    def add_filter(self, filter_class: type) -> None:
+    def add_filter(self, filter_class: Filter) -> None:
         self.filter = filter_class(self)
 
     def on_init(self) -> None:
         """
         check filter when strategy is started.
         """
-        if self.filter and not isinstance(self.filter, BaseFilter):
+        if not isinstance(self.filter, BaseFilter):
             raise ValueError('wrong filter class')
         self.on_cr_init()
 
@@ -58,8 +58,7 @@ class CrCtaTemplate(CtaTemplate):
         """
         filter when strategy is started.
         """
-        if self.filter:
-            self.filter.on_start()
+        self.filter.on_start()
         self.on_cr_start()
 
     def on_bar(self, bar: BarData) -> None:
@@ -69,8 +68,10 @@ class CrCtaTemplate(CtaTemplate):
         self.__bg.update_bar(bar)
 
     def on_call_bar(self, bar: BarData) -> None:
-        if self.filter:
-            self.filter.on_bar(bar)
+        """
+        callback
+        """
+        self.filter.on_bar(bar)
         self.on_cr_bar(bar)
 
     def on_tick(self, tick: TickData) -> None:
@@ -78,32 +79,28 @@ class CrCtaTemplate(CtaTemplate):
         filter on tick data update.
         """
         self.__bg.update_tick(tick)
-        if self.filter:
-            self.filter.on_tick(tick)
+        self.filter.on_tick(tick)
         self.on_cr_tick(tick)
 
     def on_trade(self, trade: TradeData) -> None:
         """
         filter on trade data update.
         """
-        if self.filter:
-            self.filter.on_trade(trade)
+        self.filter.on_trade(trade)
         self.on_cr_trade(trade)
 
     def on_order(self, order: OrderData) -> None:
         """
         filter on order data update.
         """
-        if self.filter:
-            self.filter.on_order(order)
+        self.filter.on_order(order)
         self.on_cr_order(order)
 
     def on_stop_order(self, stop_order: StopOrder) -> None:
         """
         filter on stop order update.
         """
-        if self.filter:
-            self.filter.on_stop_order(stop_order)
+        self.filter.on_stop_order(stop_order)
         self.on_cr_stop_order(stop_order)
 
     @virtual
@@ -166,7 +163,7 @@ class CrCtaTemplate(CtaTemplate):
         """
         Send buy order to open a long position.
         """
-        if self.buy_toggle:
+        if self.filter.buy_toggle:
             return self.send_order(
                 Direction.LONG,
                 Offset.OPEN,
@@ -188,7 +185,7 @@ class CrCtaTemplate(CtaTemplate):
         """
         Send sell order to close a long position.
         """
-        if self.sell_toggle:
+        if self.filter.sell_toggle:
             return self.send_order(
                 Direction.SHORT,
                 Offset.CLOSE,
@@ -210,7 +207,7 @@ class CrCtaTemplate(CtaTemplate):
         """
         Send short order to open as short position.
         """
-        if self.short_toggle:
+        if self.filter.short_toggle:
             return self.send_order(
                 Direction.SHORT,
                 Offset.OPEN,
@@ -232,7 +229,7 @@ class CrCtaTemplate(CtaTemplate):
         """
         Send cover order to close a short position.
         """
-        if self.cover_toggle:
+        if self.filter.cover_toggle:
             return self.send_order(
                 Direction.LONG,
                 Offset.CLOSE,
