@@ -40,17 +40,17 @@ class CrCtaTemplate(CtaTemplate):
         # self.short_toggle = True
         # self.cover_toggle = True
         # self.variables.extend(['buy_toggle', 'sell_toggle', 'short_toggle', 'cover_toggle'])
-        self.filter = BaseFilter()
+        self.filter = Filter()
         self.__bg = BarGenerator(self.on_bar, window, self.on_call_bar, interval)
 
-    def add_filter(self, filter_class: Filter) -> None:
+    def add_filter(self, filter_class: BaseFilter) -> None:
         self.filter = filter_class(self)
 
     def on_init(self) -> None:
         """
         check filter when strategy is started.
         """
-        if not isinstance(self.filter, BaseFilter):
+        if not isinstance(self.filter, Filter):
             raise ValueError('wrong filter class')
         self.on_cr_init()
 

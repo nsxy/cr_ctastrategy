@@ -21,7 +21,7 @@ class BaseLogic(ABC):
     def __call__(self, am: ArrayManager, *args: Any, **kwds: Any) -> bool:
         pass
 
-class BaseFilter(ABC):
+class Filter(ABC):
 
     def __init__(self) -> None:
         self.trading_toggle = True
@@ -65,7 +65,7 @@ class BaseFilter(ABC):
         """
         pass
 
-class Filter(BaseFilter):
+class BaseFilter(Filter):
 
     def __init__(self, strategy: CtaTemplate) -> None:
         super().__init__()
