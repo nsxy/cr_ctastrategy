@@ -31,6 +31,14 @@ class BaseFilter(ABC):
         return self.__strategy
 
     @property
+    def trading_toggle(self) -> bool:
+        return self.__strategy.trading
+
+    @trading_toggle.setter
+    def trading(self, val: bool=True) -> None:
+        self.__strategy.trading = val
+
+    @property
     def buy_toggle(self) -> bool:
         return self.__strategy.buy_toggle
     

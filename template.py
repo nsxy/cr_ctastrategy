@@ -34,7 +34,7 @@ class CrCtaTemplate(CtaTemplate):
         interval: Interval.MINUTE = Interval.MINUTE,
     ):
         super().__init__(cta_engine, strategy_name, vt_symbol, setting)
-        ### fliter toggle
+        ### filter toggle
         self.buy_toggle = True
         self.sell_toggle = True
         self.short_toggle = True

@@ -3,7 +3,7 @@
 __version__ = "2.8.0"
 
 from .base import BaseLogic, BaseFilter
-from .backtesting import CrBacktestingEngine
+from .backtesting import CrBacktestingEngine, OptimizationSetting
 from .template import CrCtaTemplate
 
 from vnpy_ctastrategy import (
