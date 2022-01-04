@@ -40,25 +40,25 @@ class CrCtaTemplate(CtaTemplate):
         # self.short_toggle = True
         # self.cover_toggle = True
         # self.variables.extend(['buy_toggle', 'sell_toggle', 'short_toggle', 'cover_toggle'])
-        self.filter = Filter()
+        self.__filter = Filter()
         self.__bg = BarGenerator(self.on_bar, window, self.on_call_bar, interval)
 
     def add_filter(self, filter_class: BaseFilter) -> None:
-        self.filter = filter_class(self)
+        self.__filter = filter_class(self)
 
     def on_init(self) -> None:
         """
         check filter when strategy is started.
         """
-        if not isinstance(self.filter, Filter):
-            raise ValueError('wrong filter class')
         self.on_cr_init()
+        if not isinstance(self.__filter, Filter):
+            raise ValueError('wrong filter class')
 
     def on_start(self):
         """
         filter when strategy is started.
         """
-        self.filter.on_start()
+        self.__filter.on_start()
         self.on_cr_start()
 
     def on_bar(self, bar: BarData) -> None:
@@ -71,7 +71,7 @@ class CrCtaTemplate(CtaTemplate):
         """
         callback
         """
-        self.filter.on_bar(bar)
+        self.__filter.on_bar(bar)
         self.on_cr_bar(bar)
 
     def on_tick(self, tick: TickData) -> None:
@@ -79,28 +79,28 @@ class CrCtaTemplate(CtaTemplate):
         filter on tick data update.
         """
         self.__bg.update_tick(tick)
-        self.filter.on_tick(tick)
+        self.__filter.on_tick(tick)
         self.on_cr_tick(tick)
 
     def on_trade(self, trade: TradeData) -> None:
         """
         filter on trade data update.
         """
-        self.filter.on_trade(trade)
+        self.__filter.on_trade(trade)
         self.on_cr_trade(trade)
 
     def on_order(self, order: OrderData) -> None:
         """
         filter on order data update.
         """
-        self.filter.on_order(order)
+        self.__filter.on_order(order)
         self.on_cr_order(order)
 
     def on_stop_order(self, stop_order: StopOrder) -> None:
         """
         filter on stop order update.
         """
-        self.filter.on_stop_order(stop_order)
+        self.__filter.on_stop_order(stop_order)
         self.on_cr_stop_order(stop_order)
 
     @virtual
@@ -163,7 +163,7 @@ class CrCtaTemplate(CtaTemplate):
         """
         Send buy order to open a long position.
         """
-        if self.filter.buy_toggle:
+        if self.__filter.buy_toggle:
             return self.send_order(
                 Direction.LONG,
                 Offset.OPEN,
@@ -185,7 +185,7 @@ class CrCtaTemplate(CtaTemplate):
         """
         Send sell order to close a long position.
         """
-        if self.filter.sell_toggle:
+        if self.__filter.sell_toggle:
             return self.send_order(
                 Direction.SHORT,
                 Offset.CLOSE,
@@ -207,7 +207,7 @@ class CrCtaTemplate(CtaTemplate):
         """
         Send short order to open as short position.
         """
-        if self.filter.short_toggle:
+        if self.__filter.short_toggle:
             return self.send_order(
                 Direction.SHORT,
                 Offset.OPEN,
@@ -229,7 +229,7 @@ class CrCtaTemplate(CtaTemplate):
         """
         Send cover order to close a short position.
         """
-        if self.filter.cover_toggle:
+        if self.__filter.cover_toggle:
             return self.send_order(
                 Direction.LONG,
                 Offset.CLOSE,
